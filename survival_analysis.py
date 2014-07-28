@@ -54,7 +54,11 @@ def main(inputfile, outputfile, buckets, time_to_churn):
 	avg_total_spent = []
 	daily_margin = []
 	counts_in_bucket = []
-
+	
+	# Again, trying to avoid for loops and using the group by apply...
+	# grouped = df.groupby(pd.cut(df.all_churn_data_gt0['use_count'], bins))
+	# def helper(x): returns x.use_count.count(), x.durations.mean(), whatever else you need
+	# grouped.apply(lambda x: helper(x)) <-- should return a data frame
 	for bucket in unique_buckets:
 		
 		indices_ = np.where(all_churn_data_gt0.use_buckets == bucket)
