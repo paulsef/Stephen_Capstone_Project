@@ -3,6 +3,15 @@ import numpy as np
 import sys, getopt
 from scipy import stats
 
+''' in general, you want to avoid using for loops when dealing with data in python
+they're super slow and it will become super obvious when you have enough data and 
+try out different implementations
+
+additionally, this seems to have a similar API to the frequency script. IE group by user,
+extract a bunch of information about the purchase/event behavior, save result. Consider
+rolling them into one script so that you have like with like
+'''
+
 def main(inputfile, outputfile):
 
 	df = pd.read_csv(inputfile)
@@ -12,8 +21,14 @@ def main(inputfile, outputfile):
 	keep = np.where((df.transaction_type == 'purchase') & (df.num_items >= 0) & (df.total_order_value > 0))[0]
 
 	df = df.iloc[keep]
+	
+	# you can skip the np.where()
+	# if you pass a mask (boolean series) to the .ix method, only the values that are True will be returned
+	# so, df = df.ix[(df.transaction_type == 'purchase') & (df.num_items >= 0) & (df.total_order_value > 0),:]
 
 	users = list(set(df['user_id']))
+	# also, np.unique('user_id').tolist(), but keep in mind that you probably want to use the 
+	# groupby and apply methods that I mentioned elswhere
 
 	df['transaction_date'] = pd.to_datetime(df['transaction_date'])
 
