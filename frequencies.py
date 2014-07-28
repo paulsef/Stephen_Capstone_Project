@@ -90,7 +90,7 @@ def main(inputfile, outputfile):
 	
 	''' whole script in a few lines:
 	def helper(x):
-		diffs = x.diff
+		diffs = x.diff()
 		day_diffs.apply(lambda x: x.astype('timedelta64[D]')/np.timedelta64(1, 'D'))
 		return day_diffs.mean(), day_diff.median(), day_diff.std
 		
