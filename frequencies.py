@@ -38,7 +38,11 @@ def main(inputfile, outputfile):
 	print "Getting max and min creation dates..."
 
 	max_created_on = df[['user_id','created_on']].groupby('user_id').max().reset_index()[['user_id','created_on']]
+	# alternatively, df.groupby('user_id')['created_at'].max().reset_index()
+	
 	max_created_on.columns = ['user_id','last_use_date']
+	# alternatively, max_created_on.rename(columns = {'created_on':'last_use_date'}) if you only
+	# have to rename on or a couple of columns
 
 	min_created_on = df[['user_id','created_on']].groupby('user_id').min().reset_index()[['user_id','created_on']]
 	min_created_on.columns = ['user_id','first_use_date']
@@ -46,6 +50,11 @@ def main(inputfile, outputfile):
 	use_counts = df[['user_id','created_on']].groupby('user_id').count().reset_index()[['user_id','created_on']]
 	use_counts.columns = ['user_id','use_count']
 
+	# last few lines in one go:
+	# df.groupby('user_id')['created_on'].agg({'first_use_date':max, 
+	#						'last_use_date':mon,
+	#						'count':count}).reset_index()
+	
 	ns_in_day = float(8.64*10**13)
 
 	all_stds = []
@@ -78,6 +87,24 @@ def main(inputfile, outputfile):
 	output_df = pd.merge(output_df, use_counts, on = 'user_id')
 
 	output_df.to_csv(outputfile)
+	
+	''' whole script in a few lines:
+	def helper(x):
+		diffs = x.diff
+		day_diffs.apply(lambda x: x.astype('timedelta64[D]')/np.timedelta64(1, 'D'))
+		return day_diffs.mean(), day_diff.median(), day_diff.std
+		
+	df = pd.read_csv(inputfile, parse_dates = [INSERT DATE COLUMN INDEX HERE])
+	grouped = df.groupby('user_id')
+	min_max_date = grouped['created_on'].agg({'first_use':min, 'last_use':max})
+	stats = grouped['created_on'].apply(lambda x: helper(x))
+	result = pd.concat(stats, min_max_date).reset_index()
+	result.to_csv()
+	
+	PANDAS IS AWESOME
+	'''
+	
+	
 
 if __name__ == '__main__':
 	main(inputfile, outputfile)
